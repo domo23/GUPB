@@ -101,7 +101,6 @@ class R2D2Controller(controller.Controller):
         else:
             return False
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         self.update_knowledge(knowledge)
         if self.on_menchir:

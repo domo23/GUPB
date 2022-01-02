@@ -62,7 +62,6 @@ class BerserkBot(controller.Controller):
         self.strategy_counter[self.strategy.name()] += 1
         # print("\nPicked up strategy: ", self.strategy.name())
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         try:
             self.knowledge_decoder.knowledge = knowledge

@@ -4,8 +4,9 @@ from typing import List, Dict
 
 from gupb.controller.bandyta.utils import DirectedCoords, rotate_cw_dc, rotate_ccw_dc, \
     step_forward
+from gupb.model.profiling import profile
 
-
+@profile
 def find_path(start: DirectedCoords, end: DirectedCoords, grid: Dict[int, Dict[int, str]]) -> List[DirectedCoords]:
     queue: List[DirectedCoords] = [start]
     return_path: Dict[DirectedCoords, DirectedCoords | None] = {start: None}

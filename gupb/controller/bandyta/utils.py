@@ -9,6 +9,7 @@ from gupb.model import characters, tiles
 from gupb.model.arenas import ArenaDescription
 from gupb.model.characters import ChampionKnowledge
 from gupb.model.coordinates import Coords, sub_coords
+from gupb.model.profiling import profile
 
 
 class Direction(Enum):
@@ -135,6 +136,7 @@ def knife_attack_possible(my_coord: Coords, enemy_coord: Coords):
     return (fabs(sub.x) == 1 and sub.y == 0) or (fabs(sub.y) == 1 and sub.x == 0)
 
 
+@profile
 def is_attack_possible(knowledge: ChampionKnowledge, weapon: Weapon, my_name: str) -> bool:
     players: Dict[str, Coords] = find_players(my_name, knowledge.visible_tiles)
 
@@ -157,10 +159,12 @@ def is_attack_possible(knowledge: ChampionKnowledge, weapon: Weapon, my_name: st
     return False
 
 
+@profile
 def safe_attack_possible(knowledge: ChampionKnowledge, weapon: Weapon, my_name: str) -> bool:
     return is_attack_possible(knowledge, weapon, my_name) and weapon not in [Weapon.knife, Weapon.amulet]
 
 
+@profile
 def find_players_with_health(name: str, visible_tiles: Dict[Coords, tiles.TileDescription]):
     players: Dict[str, (Coords, int)] = {}
     for cords, tile in visible_tiles.items():
@@ -170,12 +174,14 @@ def find_players_with_health(name: str, visible_tiles: Dict[Coords, tiles.TileDe
     return players
 
 
+@profile
 def get_my_health(name: str, visible_tiles: Dict[Coords, tiles.TileDescription]) -> int:
     for cords, tile in visible_tiles.items():
         if tile.character is not None and tile.character.controller_name != name:
             return tile.character.health
 
 
+@profile
 def find_players(name: str, visible_tiles: Dict[Coords, tiles.TileDescription]) -> Dict[str, Coords]:
     players: Dict[str, Coords] = find_players_with_health(name, visible_tiles)
     players_without_health: Dict[str, Coords] = {}
@@ -184,6 +190,7 @@ def find_players(name: str, visible_tiles: Dict[Coords, tiles.TileDescription]) 
     return players_without_health
 
 
+@profile
 def find_closest_player(name: str, knowledge: ChampionKnowledge):
     players = find_players(name, knowledge.visible_tiles)
     if len(players) == 0:
@@ -197,12 +204,14 @@ def find_closest_player(name: str, knowledge: ChampionKnowledge):
     return player, players[player]
 
 
+@profile
 def find_target_player(name: str, knowledge: ChampionKnowledge, target: str) -> Tuple[str, Coords]:
     players = find_players(name, knowledge.visible_tiles)
     return (target, players[target]) if target in players.keys() else \
         (list(players.keys())[0], list(players.values())[0]) if len(players) > 0 else None
 
 
+@profile
 def safe_find_target_player(name: str, knowledge: ChampionKnowledge, target: str) -> Tuple[str, Coords]:
     players = find_players_with_health(name, knowledge.visible_tiles)
     my_health = get_my_health(name, knowledge.visible_tiles)
@@ -210,6 +219,7 @@ def safe_find_target_player(name: str, knowledge: ChampionKnowledge, target: str
         (list(players.keys())[0], list(players.values())[0][0]) if len(players) > 0 else None
 
 
+@profile
 def find_menhir(visible_tiles: Dict[Coords, tiles.TileDescription]):
     for cords, tile in visible_tiles.items():
         if tile.type == 'menhir':
@@ -217,6 +227,7 @@ def find_menhir(visible_tiles: Dict[Coords, tiles.TileDescription]):
     return None
 
 
+@profile
 def find_furthest_point(landscape_map: Dict[int, Dict[int, str]], position: Coords):
     furthest_point = position
     for x, x_map in landscape_map.items():
@@ -229,6 +240,7 @@ def find_furthest_point(landscape_map: Dict[int, Dict[int, str]], position: Coor
     return furthest_point
 
 
+@profile
 def read_arena(arena_description: ArenaDescription):
     arena = {'land': [], 'wall': [], 'knife': [], 'sword': [], 'axe': [], 'bow': [], 'amulet': []}
     with open(f"resources/arenas/{arena_description.name}.gupb", "r") as f:
@@ -260,6 +272,7 @@ def read_arena(arena_description: ArenaDescription):
     return arena
 
 
+@profile
 def parse_arena(arena):
     item_map = dict()
     landscape_map = dict()
@@ -281,6 +294,7 @@ def parse_arena(arena):
     return item_map, landscape_map
 
 
+@profile
 def extract_pytagorian_nearest(state: State) -> DirectedCoords:
     my_position = state.directed_position.coords
 
@@ -325,6 +339,7 @@ def nearest_coord_to_attack(
     return best_coord
 
 
+@profile
 def possible_attack_coords(enemies_positions: List[Coords], weapon: Weapon, state: State) -> List[DirectedCoords]:
     coords2attack: List[List[DirectedCoords]] = []
     for enemy_position in enemies_positions:
@@ -352,6 +367,7 @@ def is_valid_coords(state: State, coords: DirectedCoords) -> bool:
     return c in state.arena['land'] or c == state.menhir
 
 
+@profile
 def line_weapon_attack_coords(target: Coords, reach_number: int, state: State) -> List[DirectedCoords]:
     possible: List[DirectedCoords] = []
     do_search_map: Dict[Direction, bool] = {
@@ -375,6 +391,7 @@ def line_weapon_attack_coords(target: Coords, reach_number: int, state: State) -
     return list(filter(lambda coords: is_valid_coords(state, coords), possible))
 
 
+@profile
 def axe_attack_coords(target: Coords, state: State) -> List[DirectedCoords]:
     possible = []
     x = target.x
@@ -387,6 +404,7 @@ def axe_attack_coords(target: Coords, state: State) -> List[DirectedCoords]:
     return list(filter(lambda coords: is_valid_coords(state, coords), possible))
 
 
+@profile
 def amulet_attack_coords(target: Coords, state: State) -> List[DirectedCoords]:
     x = target.x
     y = target.y
@@ -399,6 +417,7 @@ def amulet_attack_coords(target: Coords, state: State) -> List[DirectedCoords]:
     return list(filter(lambda coords: is_valid_coords(state, coords), possible))
 
 
+@profile
 def is_mist_coming(knowledge: ChampionKnowledge):
     for cords, tile in knowledge.visible_tiles.items():
         for effect in tile.effects:
@@ -407,12 +426,14 @@ def is_mist_coming(knowledge: ChampionKnowledge):
     return False
 
 
+@profile
 def get_my_weapon(visible_tiles: Dict[Coords, tiles.TileDescription], name: str):
     for cords, tile in visible_tiles.items():
         if tile.character is not None and tile.character.controller_name == name:
             return Weapon.from_string(tile.character.weapon.name)
 
 
+@profile
 def update_item_map(knowledge: ChampionKnowledge, item_map: Dict[Coords, Weapon]) -> Dict[Coords, Weapon]:
     item_map = item_map.copy()
 
@@ -426,6 +447,7 @@ def update_item_map(knowledge: ChampionKnowledge, item_map: Dict[Coords, Weapon]
     return item_map
 
 
+@profile
 def get_weapon_path(
         dc: DirectedCoords,
         item_map: Dict[Coords, Weapon],
@@ -450,6 +472,7 @@ def get_weapon_path(
     return Path('', [])
 
 
+@profile
 def move_on_path(state: State, dc: DirectedCoords) -> characters.Action:
     next_node = state.path.route.pop(0)
 

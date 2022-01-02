@@ -12,6 +12,7 @@ from gupb.controller.bandyta.utils import DirectedCoords, safe_find_target_playe
 from gupb.model import characters
 from gupb.model.characters import ChampionKnowledge
 from gupb.model.coordinates import Coords
+from gupb.model.profiling import profile
 
 
 class Tactics(Enum):
@@ -23,7 +24,7 @@ class Tactics(Enum):
     def list(cls):
         return list(map(lambda c: c.value, cls))
 
-
+@profile
 def passive_tactic(state: State, knowledge: ChampionKnowledge):
     player: Tuple[str, Coords] = safe_find_target_player(state.name, knowledge, state.path.dest)
     preferred_weapons = [Weapon.bow_loaded, Weapon.bow_unloaded, Weapon.bow]
@@ -65,7 +66,7 @@ def passive_tactic(state: State, knowledge: ChampionKnowledge):
 
     return random.choice(POSSIBLE_ACTIONS)
 
-
+@profile
 def aggressive_tactic(state: State, knowledge: ChampionKnowledge):
     player: Tuple[str, Coords] = find_target_player(state.name, knowledge, state.path.dest)
     preferred_weapons = [Weapon.axe, Weapon.amulet, Weapon.sword]
@@ -107,7 +108,7 @@ def aggressive_tactic(state: State, knowledge: ChampionKnowledge):
 
     return random.choice(POSSIBLE_ACTIONS)
 
-
+@profile
 def archer_tactic(state: State, knowledge: ChampionKnowledge):
     player: Tuple[str, Coords] = safe_find_target_player(state.name, knowledge, state.path.dest)
     players = find_players(state.name, knowledge.visible_tiles)

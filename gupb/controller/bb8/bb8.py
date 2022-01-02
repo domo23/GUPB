@@ -28,7 +28,6 @@ class BB8Controller(controller.Controller):
     def praise(self, score: int) -> None:
         pass
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         return self.strategy.decide(knowledge)
 

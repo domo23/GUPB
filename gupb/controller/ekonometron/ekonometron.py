@@ -89,7 +89,6 @@ class EkonometronController(controller.Controller):
         else:
             self.chosen_strategy = random.choice(strategies_list)
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         # if bot holds an unloaded bow
         if self.hold_weapon == "bow_unloaded":

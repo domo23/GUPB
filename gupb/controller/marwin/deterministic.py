@@ -51,7 +51,6 @@ class DeterministicMarwinController(BaseMarwinController):
         self._last_position = None
         self._i = 0
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         try:
             return self._decide(knowledge)

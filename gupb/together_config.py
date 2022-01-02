@@ -14,10 +14,11 @@ CONFIGURATION = {
         'archipelago',
         'dungeon',
         'fisher_island',
+        'wasteland'
     ],
     'controllers': [
         funny.FunnyController(),
-        # bandyta.Bandyta("1.0"),
+        bandyta.Bandyta("1.0"),
         wietnamczyk.WIETnamczyk(),
         berserk.BerserkBot("Ragnar"),
         r2d2.R2D2Controller("R2D2"),
@@ -29,5 +30,6 @@ CONFIGURATION = {
     'start_balancing': False,
     'visualise': False,
     'show_sight': None,
-    'runs_no': 500,
+    'runs_no': 50,
+    'profiling_metrics': ['total', 'avg']
 }

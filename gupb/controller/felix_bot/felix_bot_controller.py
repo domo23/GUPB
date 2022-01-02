@@ -55,7 +55,6 @@ class FelixBotController(controller.Controller):
         self.current_strategy = self.choose_strategy()
         self.current_strategy.reset(arena_description)
 
-    @profile
     def decide(self, knowledge: characters.ChampionKnowledge) -> characters.Action:
         return self.current_strategy.decide(knowledge)
 
